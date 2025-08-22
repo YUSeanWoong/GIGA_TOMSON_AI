@@ -1,4 +1,4 @@
-name: CI/CD tomson-ai to GCP VM
+name: Build and Push Docker
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,22 +22,39 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           export_default_credentials: true
 
-      # 3. Docker 로그인 (Artifact Registry)
-      - name: Configure Docker
+      # 3. Docker 로그인 (gcloud credential helper 사용)
+      - name: Configure Docker with GCP
         run: |
-          gcloud auth configure-docker --quiet asia-northeast3-docker.pkg.dev
+          gcloud auth configure-docker asia-northeast3-docker.pkg.dev --quiet
+          echo "== Docker credentials helper config =="
+          cat ~/.docker/config.json   # Docker가 GCP credential helper를 등록했는지 확인
 
-      # 4. Docker 이미지 빌드 & 태깅
+      # 4. 인증 정보 확인 (debug)
+      - name: Test GCP credentials
+        run: |
+          echo "== gcloud auth list =="
+          gcloud auth list
+          echo "== gcloud config list =="
+          gcloud config list
+          echo "== Docker login test =="
+          docker login -u _json_key --password-stdin https://asia-northeast3-docker.pkg.dev <<< "${{ secrets.GCP_SA_KEY }}"
+
+      # 5. Docker 이미지 빌드
       - name: Build Docker image
         run: |
-          docker build -t tomson-ai:latest asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
+          IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:${{ github.sha }}
+          echo "Building Docker image $IMAGE"
+          docker build -t $IMAGE ./   # 로컬 디렉토리(./)를 빌드 컨텍스트로 사용
 
-      # 5. Docker 이미지 푸시
+      # 6. Docker 이미지 푸시
       - name: Push Docker image
         run: |
-          docker push asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
+          IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:${{ github.sha }}
+          echo "Pushing Docker image $IMAGE"
+          docker push $IMAGE
 
-      # 6. VM에 SSH 접속 후 컨테이너 재시작 s
+
+      # 7. VM에 SSH 접속 후 컨테이너 재시작 s
       - name: Deploy to VM
         uses: appleboy/ssh-action@v0.1.7
         with:
