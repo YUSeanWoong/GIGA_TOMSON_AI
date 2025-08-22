@@ -1,42 +1,41 @@
-name: CI/CD tomson-ai to GCP VM
+name: Build and Push Docker to Artifact Registry
 
 on:
   push:
     branches:
-      - main
+      - main  # main 브랜치에 push될 때 실행
 
 jobs:
-  build-and-deploy:
+  docker:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 코드 체크아웃
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      # 2. GCP 인증
-      - name: Setup GCP credentials
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          export_default_credentials: true
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
 
-      # 3. Docker 로그인 (Artifact Registry)
-      - name: Configure Docker
-        run: |
-          gcloud auth configure-docker asia-northeast3-docker.pkg.dev
+    - name: Configure Docker to use Artifact Registry
+      run: |
+        gcloud auth configure-docker asia-northeast3-docker.pkg.dev
 
-      # 4. Docker 이미지 빌드 & 태깅
-      - name: Build Docker image
-        run: |
-          docker build -t tomson-ai:latest .
-          docker tag tomson-ai:latest asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
+    - name: Build Docker image
+      run: |
+        docker build -t tomson-ai:latest .
 
-      # 5. Docker 이미지 푸시
-      - name: Push Docker image
-        run: |
-          docker push asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
+    - name: Tag Docker image for Artifact Registry
+      run: |
+        docker tag tomson-ai:latest asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
+
+    - name: Push Docker image
+      run: |
+        docker push asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
+
 
       # 6. VM에 SSH 접속 후 컨테이너 재시작
       - name: Deploy to VM
