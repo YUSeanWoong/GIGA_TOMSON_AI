@@ -1,0 +1,57 @@
+name: CI/CD FastAPI to GCP VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️. GCP 인증
+      - name: Setup GCP credentials
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          export_default_credentials: true
+
+      # 3️. Docker 로그인 (Artifact Registry)
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker asia-northeast3-docker.pkg.dev
+
+      # 4. Docker 이미지 빌드 & 태깅
+      - name: Build Docker image
+        run: |
+          docker build -t fastapi-app:latest .
+          docker tag fastapi-app:latest ${{ secrets.ARTIFACT_REGISTRY }}/fastapi-app:latest
+
+      # 5️. Docker 이미지 푸시
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.ARTIFACT_REGISTRY }}/fastapi-app:latest
+
+      # 6️. VM에 SSH 접속 후 컨테이너 재시작
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull ${{ secrets.ARTIFACT_REGISTRY }}/fastapi-app:latest
+            docker stop fastapi-app || true
+            docker rm fastapi-app || true
+            docker run -d -p 8080:8080 \
+              -e DB_URL="${{ secrets.DB_URL }}" \
+              -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+              -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+              --name fastapi-app \
+              ${{ secrets.ARTIFACT_REGISTRY }}/fastapi-app:latest
