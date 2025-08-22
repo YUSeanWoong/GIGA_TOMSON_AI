@@ -20,7 +20,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # 6) Docker → Artifact Registry 인증 설정
+      # 6) Docker → Artifact Registry 인증 설정dsaads
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker --quiet asia-northeast3-docker.pkg.dev
 
@@ -30,6 +30,7 @@ jobs:
           REPO=tomson-ai
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
           docker build -t $IMAGE .
+          
       # 8) 이미지 푸시
       - name: Push to Artifact Registry
         run: |
