@@ -22,11 +22,10 @@ jobs:
           project_id: giga-tomson-real
           export_default_credentials: true
 
-      # 3. Docker 로그인 (Artifact Registry)
-      - name: Configure Docker
+      # 3. Docker 로그인 (Artifact Registry)        
+      - name: Configure Docker with Access Token
         run: |
-          gcloud auth activate-service-account --key-file=${{ secrets.GCP_SA_KEY }}
-          gcloud auth configure-docker asia-northeast3-docker.pkg.dev
+          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://asia-northeast3-docker.pkg.dev
 
       # 4. Docker 이미지 빌드 & 태깅
       - name: Build Docker image
