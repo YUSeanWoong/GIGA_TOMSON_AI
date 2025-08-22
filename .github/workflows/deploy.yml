@@ -14,27 +14,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. GCP 인증
+      # 5) GCP 인증 (서비스 계정 키)
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # 3. Docker 로그인 (Artifact Registry)
-      - name: Configure Docker
-        run: |
-          gcloud auth configure-docker asia-northeast3-docker.pkg.dev
+      # 6) Docker → Artifact Registry 인증 설정
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker --quiet asia-northeast3-docker.pkg.dev
 
-      # 4. Docker 이미지 빌드 & 태깅
-      - name: Build Docker image
+      # 7) Docker 이미지 빌드
+      - name: Build & Tag Docker image
         run: |
-          docker build -t tomson-ai:latest .
-          docker tag tomson-ai:latest asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
+          REPO=tomson-ai
+          IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
+          docker build -t $IMAGE .
 
-      # 5. Docker 이미지 푸시
-      - name: Push Docker image
-        run: |
-          docker push asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
 
       # 6. VM에 SSH 접속 후 컨테이너 재시작 s
       - name: Deploy to VM
