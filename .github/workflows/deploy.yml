@@ -26,17 +26,19 @@ jobs:
       - name: Configure Docker
         run: |
           gcloud auth configure-docker asia-northeast3-docker.pkg.dev
-
-      # 4. Docker 이미지 빌드 & 태깅
-      - name: Build Docker image
+          
+   # 7) Docker 이미지 빌드
+      - name: Build & Tag Docker image
         run: |
-          docker build -t tomson-ai:latest .
-          docker tag tomson-ai:latest asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest .
-
-      # 5. Docker 이미지 푸시
-      - name: Push Docker image
+          REPO=tomson-ai
+          IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
+          docker build -t $IMAGE .
+      # 8) 이미지 푸시
+      - name: Push to Artifact Registry
         run: |
-          docker push asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest .
+          REPO=tomson-ai
+          IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
+          docker push $IMAGE
 
       # 6. VM에 SSH 접속 후 컨테이너 재시작 s
       - name: Deploy to VM
