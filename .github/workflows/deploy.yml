@@ -55,3 +55,55 @@ jobs:
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
               --name tomson-ai \
               asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:${{ github.sha }}
+
+
+- name: Deploy to VM via SSH
+
+        env :
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+        run: |          
+          REPO=tomson-ai
+          IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
+        
+          ssh -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              -i ~/.ssh/id_rsa \
+              ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} \
+              "set -Eeuo pipefail
+               set -x
+          
+               DB_URL='${DB_URL}'
+               DB_USERNAME='${DB_USERNAME}'
+               DB_PASSWORD='${DB_PASSWORD}'
+                    
+               echo '>>> Stop & remove old container'
+               docker pull $IMAGE
+          
+               echo '>>> Stop & remove old container'
+               docker stop backend-container 2>/dev/null || true 
+               docker rm backend-container 2>/dev/null || true 
+          
+               echo '>>> Run new container'
+               docker run -d --name backend-container \
+               -p 80:8080 \
+               -e SPRING_DATASOURCE_URL=\"\$DB_URL\" \
+               -e SPRING_DATASOURCE_USERNAME=\"\$DB_USERNAME\" \
+               -e SPRING_DATASOURCE_PASSWORD=\"\$DB_PASSWORD\" \
+                $IMAGE && \
+              
+               echo '>>> Wait and verify container status'
+               sleep 5
+               if [ \$(docker inspect -f '{{.State.Running}}' backend-container || echo false) != 'true' ]; then
+                 echo '❌ Container is not running. Logs:'
+                 docker logs --tail=300 backend-container || true
+                 docker ps -a || true
+                 exit 1
+               fi
+               echo '✅ Container is running successfully'
+                
+               docker images --format '{{.Repository}}:{{.Tag}} {{.CreatedAt}}' \
+               | grep '^asia-northeast3-docker.pkg.dev' \
+               | sort -rk2 | awk 'NR>2 {print \$1}' | xargs -r docker rmi"
