@@ -1,4 +1,4 @@
-name: CI/CD FastAPI to GCP VM
+name: CI/CD tomson-ai to GCP VM
 
 on:
   push:
