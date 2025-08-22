@@ -38,33 +38,15 @@ jobs:
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
           docker push $IMAGE
 
-      # 6. VM에 SSH 접속 후 컨테이너 재시작 sdsasaddsa
-      - name: Deploy to VM
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            docker pull asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:${{ github.sha }}
-            docker stop tomson-ai || true
-            docker rm tomson-ai || true
-            docker run -d -p 80:8007 \
-              -e DB_URL="${{ secrets.DB_URL }}" \
-              -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
-              -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-              --name tomson-ai \
-              asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:${{ github.sha }}
-
        # 9) VM에 SSH로 접속해 컨테이너 업데이트
-       - name: Deploy to VM via SSH
+      - name: Deploy to VM via SSH
 
         env :
           DB_URL: ${{ secrets.DB_URL }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-        run: |          
+        run: |
           REPO=tomson-ai
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
         
@@ -78,7 +60,10 @@ jobs:
                DB_URL='${DB_URL}'
                DB_USERNAME='${DB_USERNAME}'
                DB_PASSWORD='${DB_PASSWORD}'
-                    
+          
+               mkdir -p ~/deploy && cd ~/deploy 
+               
+          
                echo '>>> Stop & remove old container'
                docker pull $IMAGE
           
