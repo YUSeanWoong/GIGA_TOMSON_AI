@@ -30,7 +30,7 @@ jobs:
       # 4. Docker 이미지 빌드 & 태깅
       - name: Build Docker image
         run: |
-          docker build -t fastapi-app:latest .
+          docker build -t fastapi-app:latest ./tomson-ai
           docker tag fastapi-app:latest ${{ secrets.ARTIFACT_REGISTRY }}/fastapi-app:latest
 
       # 5️. Docker 이미지 푸시
