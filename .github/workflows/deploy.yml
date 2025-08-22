@@ -14,19 +14,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. GCP 인증
+ # 5) GCP 인증 (서비스 계정 키)
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      # 6) Docker → Artifact Registry 인증 설정
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker --quiet asia-northeast3-docker.pkg.dev
 
-      # 3. Docker 로그인 (Artifact Registry)
-      - name: Configure Docker
-        run: |
-          gcloud auth configure-docker asia-northeast3-docker.pkg.dev
-          
-   # 7) Docker 이미지 빌드
+      # 7) Docker 이미지 빌드
       - name: Build & Tag Docker image
         run: |
           REPO=tomson-ai
