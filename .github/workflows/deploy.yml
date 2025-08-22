@@ -38,7 +38,7 @@ jobs:
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
           docker push $IMAGE
 
-      # 6. VM에 SSH 접속 후 컨테이너 재시작 s
+      # 6. VM에 SSH 접속 후 컨테이너 재시작 sdsa
       - name: Deploy to VM
         uses: appleboy/ssh-action@v0.1.7
         with:
