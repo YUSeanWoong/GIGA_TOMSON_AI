@@ -22,8 +22,8 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           export_default_credentials: true
 
-      # 3. Artifact Registry Docker 로그인
-      - name: Configure Docker for Artifact Registry
+      # 3. Docker 로그인 (Artifact Registry)
+      - name: Configure Docker
         run: |
           gcloud auth configure-docker asia-northeast3-docker.pkg.dev
 
@@ -31,12 +31,12 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t tomson-ai:latest .
-          docker tag tomson-ai:latest ${{ secrets.ARTIFACT_REGISTRY }}/tomson-ai:latest
+          docker tag tomson-ai:latest asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
 
-      # 5. Docker 이미지 푸시 (Artifact Registry)
-      - name: Push Docker image to Artifact Registry
+      # 5. Docker 이미지 푸시
+      - name: Push Docker image
         run: |
-          docker push ${{ secrets.ARTIFACT_REGISTRY }}/tomson-ai:latest
+          docker push asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
 
       # 6. VM에 SSH 접속 후 컨테이너 재시작
       - name: Deploy to VM
@@ -46,7 +46,7 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull ${{ secrets.ARTIFACT_REGISTRY }}/tomson-ai:latest
+            docker pull asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
             docker stop tomson-ai || true
             docker rm tomson-ai || true
             docker run -d -p 8080:8080 \
@@ -54,4 +54,4 @@ jobs:
               -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
               --name tomson-ai \
-              ${{ secrets.ARTIFACT_REGISTRY }}/tomson-ai:latest
+              asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
