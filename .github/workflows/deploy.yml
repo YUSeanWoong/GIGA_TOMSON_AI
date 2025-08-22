@@ -18,40 +18,40 @@ jobs:
       - name: Setup GCP credentials
         uses: google-github-actions/setup-gcloud@v1
         with:
-          service_account_key: '{"type":"service_account","project_id":"giga-tomson-real","private_key_id":"YOUR_KEY_ID","private_key":"-----BEGIN PRIVATE KEY-----\n...YOUR KEY...\n-----END PRIVATE KEY-----\n","client_email":"your-sa@giga-tomson-real.iam.gserviceaccount.com","client_id":"YOUR_CLIENT_ID","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"YOUR_CERT_URL"}'
-          project_id: giga-tomson-real
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
           export_default_credentials: true
 
-      # 3. Docker 로그인 (Artifact Registry)        
-      - name: Configure Docker with Access Token
+      # 3. Docker 로그인 (Artifact Registry)
+      - name: Configure Docker
         run: |
-          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://asia-northeast3-docker.pkg.dev
+          gcloud auth configure-docker asia-northeast3-docker.pkg.dev
 
       # 4. Docker 이미지 빌드 & 태깅
       - name: Build Docker image
         run: |
           docker build -t tomson-ai:latest .
-          docker tag tomson-ai:latest asia-northeast3-docker.pkg.dev/giga-tomson-real/tomson-ai/tomson-ai:latest
+          docker tag tomson-ai:latest asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
 
       # 5. Docker 이미지 푸시
       - name: Push Docker image
         run: |
-          docker push asia-northeast3-docker.pkg.dev/giga-tomson-real/tomson-ai/tomson-ai:latest
+          docker push asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
 
-      # 6. VM에 SSH 접속 후 컨테이너 재시작
+      # 6. VM에 SSH 접속 후 컨테이너 재시작sda
       - name: Deploy to VM
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: VM_EXTERNAL_IP_OR_HOSTNAME
-          username: onlypam6149
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull asia-northeast3-docker.pkg.dev/giga-tomson-real/tomson-ai/tomson-ai:latest
+            docker pull asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
             docker stop tomson-ai || true
             docker rm tomson-ai || true
             docker run -d -p 8080:8080 \
-              -e DB_URL="YOUR_DB_URL" \
-              -e DB_USERNAME="YOUR_DB_USERNAME" \
-              -e DB_PASSWORD="YOUR_DB_PASSWORD" \
+              -e DB_URL="${{ secrets.DB_URL }}" \
+              -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+              -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
               --name tomson-ai \
-              asia-northeast3-docker.pkg.dev/giga-tomson-real/tomson-ai/tomson-ai:latest
+              asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
