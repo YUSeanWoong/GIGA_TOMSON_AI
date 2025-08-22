@@ -47,6 +47,10 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
         run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
           REPO=tomson-ai
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
         
