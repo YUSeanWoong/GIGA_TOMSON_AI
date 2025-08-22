@@ -38,7 +38,7 @@ jobs:
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
           docker push $IMAGE
 
-      # 6. VM에 SSH 접속 후 컨테이너 재시작 sdsa
+      # 6. VM에 SSH 접속 후 컨테이너 재시작 sdsasaddsa
       - name: Deploy to VM
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -49,7 +49,7 @@ jobs:
             docker pull asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
             docker stop tomson-ai || true
             docker rm tomson-ai || true
-            docker run -d -p 8080:8080 \
+            docker run -d -p 8007:8007 \
               -e DB_URL="${{ secrets.DB_URL }}" \
               -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
               -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
