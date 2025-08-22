@@ -22,7 +22,7 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           export_default_credentials: true
 
-      # 3. Docker 로그인 (gcloud credential helper 사용)
+      # 3. Docker 로그인 (gcloud credential helper 사용)sdds
       - name: Configure Docker with GCP
         run: |
           gcloud auth configure-docker asia-northeast3-docker.pkg.dev --quiet
