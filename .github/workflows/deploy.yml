@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️. 코드 체크아웃
+      # 1️.코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️. GCP 인증
+      # 2️.GCP 인증
       - name: Setup GCP credentials
         uses: google-github-actions/setup-gcloud@v1
         with:
@@ -22,23 +22,23 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           export_default_credentials: true
 
-      # 3️. Docker 로그인 (Artifact Registry)
+      # 3️.Docker 인증 (Artifact Registry)
       - name: Configure Docker
         run: |
           gcloud auth configure-docker asia-northeast3-docker.pkg.dev
 
-      # 4. Docker 이미지 빌드 & 태깅
+      # 4️.Docker 이미지 빌드 & 태깅
       - name: Build Docker image
         run: |
           docker build -t tomson-ai:latest .
           docker tag tomson-ai:latest ${{ secrets.ARTIFACT_REGISTRY }}/tomson-ai:latest
 
-      # 5️. Docker 이미지 푸시
+      # 5️.Docker 이미지 push
       - name: Push Docker image
         run: |
           docker push ${{ secrets.ARTIFACT_REGISTRY }}/tomson-ai:latest
 
-      # 6️. VM에 SSH 접속 후 컨테이너 재시작
+      # 6️.VM에 SSH 접속 후 컨테이너 재시작
       - name: Deploy to VM
         uses: appleboy/ssh-action@v0.1.7
         with:
