@@ -30,8 +30,7 @@ jobs:
       # 4. Docker 이미지 빌드 & 태깅
       - name: Build Docker image
         run: |
-          docker build -t tomson-ai:latest .
-          docker tag tomson-ai:latest asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
+          docker build -t tomson-ai:latest asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:latest
 
       # 5. Docker 이미지 푸시
       - name: Push Docker image
