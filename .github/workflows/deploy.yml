@@ -56,8 +56,8 @@ jobs:
               --name tomson-ai \
               asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tomson-ai/tomson-ai:${{ github.sha }}
 
-
-- name: Deploy to VM via SSH
+       # 9) VM에 SSH로 접속해 컨테이너 업데이트
+       - name: Deploy to VM via SSH
 
         env :
           DB_URL: ${{ secrets.DB_URL }}
