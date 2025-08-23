@@ -101,6 +101,5 @@ jobs:
                docker images --filter=reference='asia-northeast3-docker.pkg.dev/*/tomson-ai/tomson-ai:*' --format '{{.ID}} {{.CreatedAt}}' \
               | sort -rk2 \
               | awk 'NR>2 {print $1}' \
-              | grep -E '^[a-f0-9]{12,}$' \
               | xargs -r docker rmi -f
               "
