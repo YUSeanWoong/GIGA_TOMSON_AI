@@ -102,4 +102,5 @@ jobs:
                   | grep '^asia-northeast3-docker.pkg.dev/.*/tomson-ai/tomson-ai:' \
                   | sort -rk2 \
                   | awk 'NR>2 {print $1}' \
-                  | xargs -r docker rmi
+                  | xargs -r docker rmi 
+                "
