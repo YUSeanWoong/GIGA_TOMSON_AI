@@ -48,15 +48,15 @@ jobs:
 
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_ai
+          chmod 600 ~/.ssh/id_rsa_ai
           
           REPO=tomson-ai
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
         
           ssh -o StrictHostKeyChecking=no \
               -o UserKnownHostsFile=/dev/null \
-              -i ~/.ssh/id_rsa \
+              -i ~/.ssh/id_rsa_ai \
               ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} \
               "set -Eeuo pipefail
                set -x
