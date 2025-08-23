@@ -67,6 +67,9 @@ jobs:
           
                mkdir -p ~/ai_deploy && cd ~/ai_deploy 
                
+               echo '>>> Docker login to Artifact Registry'
+                gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://asia-northeast3-docker.pkg.dev
+
           
                echo '>>> Stop & remove old container'
                docker pull $IMAGE
