@@ -80,7 +80,8 @@ jobs:
           
                echo '>>> Run new container'
                docker run -d --name tomson-ai \
-               -p 80:8007 \
+               --network appnet \
+               --expose 8090 \
                -e SPRING_DATASOURCE_URL=\"\$DB_URL\" \
                -e SPRING_DATASOURCE_USERNAME=\"\$DB_USERNAME\" \
                -e SPRING_DATASOURCE_PASSWORD=\"\$DB_PASSWORD\" \
