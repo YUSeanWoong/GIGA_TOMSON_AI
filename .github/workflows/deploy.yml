@@ -65,19 +65,19 @@ jobs:
                DB_USERNAME='${DB_USERNAME}'
                DB_PASSWORD='${DB_PASSWORD}'
           
-               mkdir -p ~/deploy && cd ~/deploy 
+               mkdir -p ~/ai_deploy && cd ~/ai_deploy 
                
           
                echo '>>> Stop & remove old container'
                docker pull $IMAGE
           
                echo '>>> Stop & remove old container'
-               docker stop backend-container 2>/dev/null || true 
-               docker rm backend-container 2>/dev/null || true 
+               docker stop tomson-ai 2>/dev/null || true 
+               docker rm tomson-ai 2>/dev/null || true 
           
                echo '>>> Run new container'
-               docker run -d --name backend-container \
-               -p 80:8080 \
+               docker run -d --name tomson-ai \
+               -p 80:8007 \
                -e SPRING_DATASOURCE_URL=\"\$DB_URL\" \
                -e SPRING_DATASOURCE_USERNAME=\"\$DB_USERNAME\" \
                -e SPRING_DATASOURCE_PASSWORD=\"\$DB_PASSWORD\" \
@@ -85,9 +85,9 @@ jobs:
               
                echo '>>> Wait and verify container status'
                sleep 5
-               if [ \$(docker inspect -f '{{.State.Running}}' backend-container || echo false) != 'true' ]; then
+               if [ \$(docker inspect -f '{{.State.Running}}' tomson-ai || echo false) != 'true' ]; then
                  echo '❌ Container is not running. Logs:'
-                 docker logs --tail=300 backend-container || true
+                 docker logs --tail=300 tomson-ai || true
                  docker ps -a || true
                  exit 1
                fi
