@@ -97,9 +97,10 @@ jobs:
                fi
                echo '✅ Container is running successfully'
                 
-               echo ">>> Cleaning up old images (keep 2 latest for tomson-ai only)"
-                docker images --filter=reference='asia-northeast3-docker.pkg.dev/*/tomson-ai/tomson-ai:*' --format '{{.ID}} {{.CreatedAt}}' \
-                  | sort -rk2 \
-                  | awk 'NR>2 {print $1}' \
-                  | xargs -r docker rmi -f
+               echo '>>> Clean up old images (keep 2 latest for tomson-ai only)'
+               docker images --filter=reference='asia-northeast3-docker.pkg.dev/*/tomson-ai/tomson-ai:*' --format '{{.ID}} {{.CreatedAt}}' \
+              | sort -rk2 \
+              | awk 'NR>2 {print $1}' \
+              | xargs -r docker rmi -f
+              
               "
