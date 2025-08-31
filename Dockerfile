@@ -13,5 +13,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 로컬의 모든 소스 코드 파일을 컨테이너의 /app 디렉토리로 복사합니다.
 COPY . .
 
-# 애플리케이션을 실행하는 명령어를 지정합니다.
+# 애플리케이션을 실행하는 명령어를 지정합니다....
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8090"]
