@@ -44,7 +44,7 @@ jobs:
           DB_URL: ${{ secrets.DB_URL }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # 이 부분을 추가했습니다.
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} 
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ai_id_rsa
@@ -63,7 +63,7 @@ jobs:
                DB_URL='${DB_URL}'
                DB_USERNAME='${DB_USERNAME}'
                DB_PASSWORD='${DB_PASSWORD}'
-               OPENAI_API_KEY='${OPENAI_API_KEY}' # 이 부분을 추가했습니다.
+               OPENAI_API_KEY='${OPENAI_API_KEY}'
                
                mkdir -p ~/ai_deploy && cd ~/ai_deploy
                
@@ -82,7 +82,7 @@ jobs:
                -e SPRING_DATASOURCE_URL=\"\$DB_URL\" \
                -e SPRING_DATASOURCE_USERNAME=\"\$DB_USERNAME\" \
                -e SPRING_DATASOURCE_PASSWORD=\"\$DB_PASSWORD\" \
-               -e OPENAI_API_KEY=\"\$OPENAI_API_KEY\" \ # 이 부분을 추가했습니다.
+               -e OPENAI_API_KEY=\"\$OPENAI_API_KEY\" \
                $IMAGE && \
                
                echo '>>> Wait and verify container status'
