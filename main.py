@@ -15,7 +15,7 @@ app = FastAPI(
 )
 
 # 환경 변수에서 Hugging Face API 키를 설정합니다.
-hugging_face_api_key = os.getenv("HUGGING_FACE_API_KEY")
+hugging_face_api_key = ${{ secrets.HUGGING_FACE_API_KEY }}
 if not hugging_face_api_key:
     # API 키가 없으면 오류를 발생시킵니다.
     raise ValueError("HUGGING_FACE_API_KEY 환경 변수가 설정되지 않았습니다.")
