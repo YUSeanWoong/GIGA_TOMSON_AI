@@ -1,72 +1,80 @@
 name: CI/CD tomson-ai to GCP VM
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
+
       # 5) Authenticate to Google Cloud (Service Account Key)
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
+
       # 6) Configure Docker for Artifact Registry
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker --quiet asia-northeast3-docker.pkg.dev
+
       # 7) Docker image build
       - name: Build & Tag Docker image
         run: |
           REPO=tomson-ai
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
           docker build -t $IMAGE .
+          
       # 8) Push image
       - name: Push to Artifact Registry
         run: |
           REPO=tomson-ai
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
           docker push $IMAGE
+
       # 9) Deploy to VM via SSH
       - name: Deploy to VM via SSH
         env:
           DB_URL: ${{ secrets.DB_URL }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          HUGGING_FACE_API_KEY: ${{ secrets.HUGGING_FACE_API_KEY }}  # <-- 이 줄로 수정
+          HUGGING_FACE_API_KEY: ${{ secrets.HUGGING_FACE_API_KEY }} 
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ai_id_rsa
           chmod 600 ~/.ssh/ai_id_rsa
-
+          
           REPO=tomson-ai
           IMAGE=asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${REPO}/tomson-ai:${{ github.sha }}
-
+          
           ssh -o StrictHostKeyChecking=no \
               -o UserKnownHostsFile=/dev/null \
               -i ~/.ssh/ai_id_rsa \
               ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} \
-              "set -Eeuo pipefail 
+              "set -Eeuo pipefail
                set -x
-                               
-               DB_URL='${DB_URL}' 
-               DB_USERNAME='${DB_USERNAME}' 
-               DB_PASSWORD='${DB_PASSWORD}' 
-               HUGGING_FACE_API_KEY='${HUGGING_FACE_API_KEY}'  # <-- 이 줄로 수정
-                               
+               
+               DB_URL='${DB_URL}'
+               DB_USERNAME='${DB_USERNAME}'
+               DB_PASSWORD='${DB_PASSWORD}'
+               HUGGING_FACE_API_KEY='${HUGGING_FACE_API_KEY}'
+               
                mkdir -p ~/ai_deploy && cd ~/ai_deploy
-                               
+               
                echo '>>> Docker login to Artifact Registry'
                gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://asia-northeast3-docker.pkg.dev
-                               
+               
                echo '>>> Stop & remove old container'
                docker pull $IMAGE
                docker stop tomson-ai 2>/dev/null || true
                docker rm tomson-ai 2>/dev/null || true
-                               
+               
                echo '>>> Run new container'
                docker run -d --name tomson-ai \
                --network appnet \
@@ -74,9 +82,9 @@ jobs:
                -e SPRING_DATASOURCE_URL=\"\$DB_URL\" \
                -e SPRING_DATASOURCE_USERNAME=\"\$DB_USERNAME\" \
                -e SPRING_DATASOURCE_PASSWORD=\"\$DB_PASSWORD\" \
-               -e HUGGING_FACE_API_KEY=\"\$HUGGING_FACE_API_KEY\" \  # <-- 이 줄로 수정
+               -e HUGGING_FACE_API_KEY=\"\$HUGGING_FACE_API_KEY\" \
                $IMAGE && \
-                               
+               
                echo '>>> Wait and verify container status'
                sleep 5
                if [ \$(docker inspect -f '{{.State.Running}}' tomson-ai || echo false) != 'true' ]; then
@@ -86,7 +94,7 @@ jobs:
                  exit 1
                fi
                echo '✅ Container is running successfully'
-                               
+               
                echo '>>> Clean up old images (keep 2 latest for tomson-ai only)'
                docker images --filter=reference='asia-northeast3-docker.pkg.dev/*/tomson-ai/tomson-ai:*' --format '{{.Repository}}:{{.Tag}} {{.CreatedAt}}' \
                | grep '^asia-northeast3-docker.pkg.dev' \
