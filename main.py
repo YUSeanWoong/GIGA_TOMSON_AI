@@ -22,6 +22,10 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 if not gemini_api_key:
     # API 키가 없으면 오류를 발생시킵니다.
     raise ValueError("GEMINI_API_KEY 환경 변수가 설정되지 않았습니다.")
+    
+if gemini_api_key:
+    # API 키가 없으면 오류를 발생시킵니다.
+    raise ValueError("tlqkf!!!!!!값은있어")   
 
 # 사용할 Gemini 모델의 API 엔드포인트입니다.
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
@@ -38,7 +42,7 @@ async def ask_chatbot(request: QuestionRequest):
     Gemini 모델에 질문을 보내고 응답을 반환합니다.
     """
     try:
-        # httpx 클라이언트를 사용해 비동기적으로 API를 호출합니다.
+        # httpx 클라이언트를 사용해 비동기적으로 API를 호출합니다.sdadsadsa
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 API_URL,
