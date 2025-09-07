@@ -11,7 +11,7 @@ app = FastAPI(
     description="Gemini API와 상호작용하는 간단한 FastAPI 애플리케이션입니다."
 )
 
-gemini_api_key = os.getenv("GEMINI_API_KEY")
+gemini_api_key = "AIzaSyDvlE6BzDH_xr9cVlYu3nw9jZW1-WZ6bUg"
 if not gemini_api_key:
     raise ValueError("GEMINI_API_KEY 환경 변수가 설정되지 않았습니다.")
 
@@ -26,7 +26,7 @@ async def ask_chatbot(request: QuestionRequest):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{API_URL}?key={gemini_api_key}", # 키를 URL 파라미터로 전달
+                f"{API_URL}?key={gemini_api_key}", # 키를 URL 파라미터로 전달dasdsa
                 headers=HEADERS,
                 json={"contents": [{"parts": [{"text": request.question}]}]}
             )
