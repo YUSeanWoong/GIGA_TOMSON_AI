@@ -39,7 +39,7 @@ async def ask_chatbot(request: QuestionRequest):
     Hugging Face 모델에 질문을 보내고 응답을 반환합니다.
     """
     try:
-        # httpx 클라이언트를 사용해 비동기적으로 API를 호출합니다.
+        # httpx 클라이언트를 사용해 비동기적으로 API를 호출합니다.sd
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 API_URL,

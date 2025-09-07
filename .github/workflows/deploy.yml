@@ -65,6 +65,8 @@ jobs:
                DB_PASSWORD='${DB_PASSWORD}'
                HUGGING_FACE_API_KEY='${HUGGING_FACE_API_KEY}'
                
+               echo $HUGGING_FACE_API_KEY
+               
                mkdir -p ~/ai_deploy && cd ~/ai_deploy
                
                echo '>>> Docker login to Artifact Registry'
