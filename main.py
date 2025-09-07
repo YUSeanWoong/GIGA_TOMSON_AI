@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 
 # .env 파일에서 환경 변수를 불러옵니다.
+# GitHub Actions에서는 .env 파일이 필요 없지만,
+# 로컬 개발 환경을 위해 포함합니다.
 load_dotenv()
 
 
@@ -15,7 +17,8 @@ app = FastAPI(
 )
 
 # 환경 변수에서 Hugging Face API 키를 설정합니다.
-hugging_face_api_key = ${{ secrets.HUGGING_FACE_API_KEY }}
+# GitHub Actions가 설정해준 환경 변수(HUGGING_FACE_API_KEY)를 읽어옵니다.
+hugging_face_api_key = os.getenv("HUGGING_FACE_API_KEY")
 if not hugging_face_api_key:
     # API 키가 없으면 오류를 발생시킵니다.
     raise ValueError("HUGGING_FACE_API_KEY 환경 변수가 설정되지 않았습니다.")
