@@ -31,7 +31,7 @@ HEADERS = {"Content-Type": "application/json"}
 class QuestionRequest(BaseModel):
     question: str
 
-# 챗봇에 질문을 보내고 답변을 받는 API 엔드포인트입니다.
+# 챗봇에 질문을 보내고 답변을 받는 API 엔드포인트입니다.adssad
 @app.post("/ask")
 async def ask_chatbot(request: QuestionRequest):
     """
