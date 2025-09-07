@@ -24,14 +24,14 @@ if not gemini_api_key:
     raise ValueError("GEMINI_API_KEY 환경 변수가 설정되지 않았습니다.")
 
 # 사용할 Gemini 모델의 API 엔드포인트입니다.
-API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent"
+API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 HEADERS = {"Content-Type": "application/json"}
 
 # 요청 본문을 위한 Pydantic 모델을 정의합니다.
 class QuestionRequest(BaseModel):
     question: str
 
-# 챗봇에 질문을 보내고 답변을 받는 API 엔드포인트입니다.adssad
+# 챗봇에 질문을 보내고 답변을 받는 API 엔드포인트입니다.
 @app.post("/ask")
 async def ask_chatbot(request: QuestionRequest):
     """
