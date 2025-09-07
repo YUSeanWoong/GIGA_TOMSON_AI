@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 # .env 파일에서 환경 변수를 불러옵니다.
 load_dotenv()
 
+
 # FastAPI 인스턴스를 생성합니다.
 app = FastAPI(
     title="Hugging Face API 연동",
