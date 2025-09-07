@@ -25,7 +25,7 @@ if not gemini_api_key:
     
 if gemini_api_key:
     # API 키가 없으면 오류를 발생시킵니다.
-    raise ValueError("tlqkf!!!!!!값은있어")   
+    print("tlqkf!!!!!!)   
 
 # 사용할 Gemini 모델의 API 엔드포인트입니다.
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
