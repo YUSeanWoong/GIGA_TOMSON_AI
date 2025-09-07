@@ -44,7 +44,7 @@ jobs:
           DB_URL: ${{ secrets.DB_URL }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          HUGGING_FACE_API_KEY: ${{ secrets.HUGGING_FACE_API_KEY }} 
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} 
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ai_id_rsa
@@ -63,9 +63,9 @@ jobs:
                DB_URL='${DB_URL}'
                DB_USERNAME='${DB_USERNAME}'
                DB_PASSWORD='${DB_PASSWORD}'
-               HUGGING_FACE_API_KEY='${HUGGING_FACE_API_KEY}'
+               GEMINI_API_KEY='${GEMINI_API_KEY}'
                
-               echo $HUGGING_FACE_API_KEY
+               echo $GEMINI_API_KEY
                
                mkdir -p ~/ai_deploy && cd ~/ai_deploy
                
@@ -84,7 +84,7 @@ jobs:
                -e SPRING_DATASOURCE_URL=\"\$DB_URL\" \
                -e SPRING_DATASOURCE_USERNAME=\"\$DB_USERNAME\" \
                -e SPRING_DATASOURCE_PASSWORD=\"\$DB_PASSWORD\" \
-               -e HUGGING_FACE_API_KEY=\"\$HUGGING_FACE_API_KEY\" \
+               -e GEMINI_API_KEY=\"\$GEMINI_API_KEY\" \
                $IMAGE && \
                
                echo '>>> Wait and verify container status'
