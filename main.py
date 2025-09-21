@@ -50,6 +50,9 @@ class LogRequest(BaseModel):
 
 @app.post("/ask")
 async def ask_chatbot(request: LogRequest):
+    body = await request.body()
+    print("RAW BODY:", body)
+    return {"raw": body}
     system_prompt = """
     너는 시간 관리 AI "기가챗"이다.
     너의 역할은 사용자가 하루에 기록한 활동 데이터를 바탕으로 
