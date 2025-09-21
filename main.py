@@ -10,6 +10,7 @@ import traceback
 import re
 load_dotenv()
 
+
 app = FastAPI(
     title="Gemini API 연동",
     description="Gemini API와 상호작용하는 간단한 FastAPI 애플리케이션입니다."
