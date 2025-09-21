@@ -15,8 +15,8 @@ app = FastAPI(
     description="Gemini API와 상호작용하는 간단한 FastAPI 애플리케이션입니다."
 )
 
-# gemini_api_key = os.getenv("GEMINI_API_KEY")
-gemini_api_key = "AIzaSyACDSf1FGfHW0Psq_EbiUmJt0a2jTRzKTs"
+gemini_api_key = os.getenv("GEMINI_API_KEY")
+
 if not gemini_api_key:
     raise ValueError("GEMINI_API_KEY 환경 변수가 설정되지 않았습니다.")
 
