@@ -1,6 +1,6 @@
 import os
 import httpx
-from fastapi import FastAPI, HTTPException,Request
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -49,10 +49,8 @@ class LogRequest(BaseModel):
     activities: Dict[str,float]   
 
 @app.post("/ask")
-async def ask_chatbot(request: Request):
-    raw = await request.body()
-    print("RAW BODY:", raw.decode("utf-8"))
-    return {"raw": raw.decode("utf-8")}
+async def ask_chatbot(request: LogRequest):
+
     system_prompt = """
     너는 시간 관리 AI "기가챗"이다.
     너의 역할은 사용자가 하루에 기록한 활동 데이터를 바탕으로 
